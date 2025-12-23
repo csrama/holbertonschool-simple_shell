@@ -24,15 +24,15 @@ This project is inspired by the original UNIX shell created by **Ken Thompson**.
 
 ---
 
-## � Features
-✔ Interactive mode  
-✔ Non-interactive mode  
-✔ Command execution with arguments  
-✔ PATH environment variable handling  
-✔ Built-in command:
-- `exit` — exits the shell  
-✔ Error handling similar to `/bin/sh`  
-✔ No memory leaks  
+## ¨ Features
+- Interactive mode  
+- Non-interactive mode  
+- Command execution with arguments  
+- PATH environment variable handling  
+- Built-in command:
+- `exit` exits the shell  
+- Error handling similar to `/bin/sh`  
+- No memory leaks  
 
 ---
 
@@ -46,7 +46,7 @@ This project is inspired by the original UNIX shell created by **Ken Thompson**.
 
 ---
 
-### � Compilation
+### Compilation
 ```bash
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 ```
@@ -76,21 +76,21 @@ $ echo "qwerty" | ./hsh
 ---
 
 ###  Requirements
-	•	Ubuntu 20.04 LTS
-	•	gcc compiler
-	•	Compilation flags:
-	•	-Wall
-	•	-Werror
-	•	-Wextra
-	•	-pedantic
-	•	-std=gnu89
-	•	Betty coding style
-	•	Maximum 5 functions per file
-	•	No memory leaks
+		Ubuntu 20.04 LTS
+		gcc compiler
+		Compilation flags:
+		-Wall
+		-Werror
+		-Wextra
+		-pedantic
+		-std=gnu89
+		Betty coding style
+		Maximum 5 functions per file
+		No memory leaks
 
 ---
 
-### 🧩 Allowed Functions
+### Allowed Functions
 
 Only approved system calls and functions are used, such as:
 `fork, execve, wait, getline, malloc, free, access, stat,
@@ -116,5 +116,5 @@ Only approved system calls and functions are used, such as:
 
 This project was developed and tested by:
 
-- **Reem Abdulhadi Alshehri**
-- **Maryam Alessa** 
+- **Raghad Almalki**
+- **Rama ALshehri**
