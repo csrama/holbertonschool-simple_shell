@@ -12,10 +12,9 @@ int main(void)
 	size_t len = 0;
 	ssize_t read;
 	char *args[64];
-	int i, j, start;
+	int i, j;
 	pid_t pid;
 	int status;
-	int empty;
 
 	while (1)
 	{
@@ -35,24 +34,20 @@ int main(void)
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		/* Check if line is empty or only spaces */
-		empty = 1;
+		/* Check if line has any non-space characters */
 		for (i = 0; line[i] != '\0'; i++)
-		{
 			if (line[i] != ' ' && line[i] != '\t')
-			{
-				empty = 0;
 				break;
-			}
-		}
-		if (empty)
+		
+		if (line[i] == '\0')
 			continue;
 
-		/* Split arguments */
+		/* Split into arguments */
 		i = 0;
 		j = 0;
 		while (line[j] != '\0')
 		{
+			/* Skip spaces */
 			while (line[j] == ' ' || line[j] == '\t')
 				j++;
 			
@@ -62,6 +57,7 @@ int main(void)
 			args[i] = &line[j];
 			i++;
 			
+			/* Find end of argument */
 			while (line[j] != '\0' && line[j] != ' ' && line[j] != '\t')
 				j++;
 			
@@ -72,9 +68,6 @@ int main(void)
 			}
 		}
 		args[i] = NULL;
-
-		if (args[0] == NULL)
-			continue;
 
 		pid = fork();
 		if (pid < 0)
