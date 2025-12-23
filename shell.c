@@ -16,11 +16,11 @@ int main(void)
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
-	char *clean;
-	char *args[2];
+	char *args[64];
+	char *token;
+	int i;
 	pid_t pid;
 	int status;
-	int i;
 
 	while (1)
 	{
@@ -44,23 +44,20 @@ int main(void)
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		/* Remove leading spaces */
-		clean = line;
-		while (*clean == ' ' || *clean == '\t')
-			clean++;
-
-		/* Remove trailing spaces */
-		i = strlen(clean) - 1;
-		while (i >= 0 && (clean[i] == ' ' || clean[i] == '\t'))
-			clean[i--] = '\0';
-
 		/* Skip empty lines */
-		if (strlen(clean) == 0)
+		if (strlen(line) == 0)
 			continue;
 
-		/* Prepare arguments for execve */
-		args[0] = clean;
-		args[1] = NULL;
+		/* Split command into arguments */
+		i = 0;
+		token = strtok(line, " ");
+		while (token != NULL && i < 63)
+		{
+			args[i] = token;
+			i++;
+			token = strtok(NULL, " ");
+		}
+		args[i] = NULL;  /* NULL terminate */
 
 		/* Fork child process */
 		pid = fork();
@@ -72,10 +69,10 @@ int main(void)
 
 		if (pid == 0)  /* Child process */
 		{
-			/* Execute command */
+			/* Execute command with arguments */
 			if (execve(args[0], args, environ) == -1)
 			{
-				fprintf(stderr, "./hsh: 1: %s: not found\n", clean);
+				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
 				exit(127);
 			}
 		}
