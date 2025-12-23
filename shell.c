@@ -40,8 +40,9 @@ void execute_command(char *command)
 		/* Execute command */
 		if (execve(args[0], args, environ) == -1)
 		{
-			fprintf(stderr, "./shell: No such file or directory\n");
-			exit(1);
+			/* Print error like sh: ./hsh: 1: command: not found */
+			fprintf(stderr, "./hsh: 1: %s: not found\n", command);
+			exit(127); /* Exit code 127 for command not found */
 		}
 	}
 	else  /* Parent process */
