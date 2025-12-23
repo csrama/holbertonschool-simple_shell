@@ -1,0 +1,219 @@
+.\" Man page for simple_shell
+.TH HSH 1 "December 2025" "Simple Shell 1.0" "User Commands"
+.SH NAME
+hsh \- a simple UNIX command interpreter
+.SH SYNOPSIS
+.B hsh
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B hsh
+is a simple UNIX shell written in C as part of the Holberton School curriculum.
+It implements basic shell functionality including command execution, built-in
+commands, and environment variable handling.
+
+The shell operates in two modes:
+.IP \(bu 2
+.I Interactive mode:
+Displays a prompt ($) and waits for user input.
+.IP \(bu 2
+.I Non-interactive mode:
+Reads commands from standard input without displaying a prompt.
+
+.SH HISTORICAL CONTEXT
+This shell project helps understand UNIX fundamentals including:
+.IP \(bu 2
+The original UNIX operating system was designed and implemented by
+.B Ken Thompson
+and
+.B Dennis Ritchie
+at Bell Labs in 1969-1970.
+.IP \(bu 2
+The first UNIX shell was written by
+.B Ken Thompson
+in 1971.
+.IP \(bu 2
+.B Ken Thompson
+invented the B programming language (predecessor to C) in 1969.
+.IP \(bu 2
+.B Ken Thompson
+is a computer science pioneer who co-created UNIX and won the Turing Award.
+
+.SH OPERATION
+A shell works by following the Read-Eval-Print Loop (REPL):
+.IP 1. 3
+Read: Get input from user or standard input
+.IP 2. 3
+Parse: Split input into command and arguments
+.IP 3. 3
+Execute: Run the command (built-in or external)
+.IP 4. 3
+Loop: Return to step 1
+
+.SH PROCESS MANAGEMENT
+.IP \(bu 2
+.B PID (Process ID):
+Unique identifier assigned to each process by the kernel.
+.IP \(bu 2
+.B PPID (Parent Process ID):
+The PID of the process that created this process.
+.IP \(bu 2
+.B fork():
+System call that creates a new process by duplicating the calling process.
+.IP \(bu 2
+.B execve():
+System call that replaces the current process image with a new one.
+.IP \(bu 2
+.B wait()/waitpid():
+System calls that suspend execution until a child process terminates.
+
+.SH BUILT-IN COMMANDS
+.TP
+.B exit [n]
+Exit the shell with status
+.I n.
+If
+.I n
+is omitted, the exit status is that of the last command.
+.TP
+.B env
+Print all environment variables to standard output.
+.TP
+.B cd [directory]
+Change the current working directory to
+.IR directory .
+Without arguments, changes to the home directory ($HOME).
+
+.SH ENVIRONMENT
+.B hsh
+manipulates the environment using:
+.IP \(bu 2
+.B extern char **environ;
+Global variable containing environment strings.
+.IP \(bu 2
+.B getenv()
+Retrieves the value of an environment variable.
+.IP \(bu 2
+.B setenv()
+Sets or changes an environment variable.
+
+The shell uses the
+.B PATH
+environment variable to locate executable files. It searches directories
+in the order they appear in PATH, separated by colons.
+
+.SH SYSTEM CALLS VS FUNCTIONS
+.IP \(bu 2
+.B System calls:
+Interface between user space and kernel space (e.g., fork, execve, wait).
+They execute in kernel mode and have higher overhead.
+.IP \(bu 2
+.B Functions:
+Library routines that execute in user space (e.g., printf, malloc, strtok).
+They have lower overhead but limited system access.
+
+Use system calls only when necessary (e.g., process creation, file I/O)
+because they involve context switching and are more expensive.
+
+.SH MAIN FUNCTION PROTOTYPES
+The three valid prototypes for main are:
+.IP 1. 3
+.B int main(void)
+.IP 2. 3
+.B int main(int argc, char *argv[])
+.IP 3. 3
+.B int main(int argc, char *argv[], char *envp[])
+.B hsh
+uses the third prototype to access environment variables.
+
+.SH EOF (END-OF-FILE)
+EOF is a condition, not a character, that indicates no more data can be read
+from a data source. In interactive mode, users can generate EOF by pressing
+Ctrl+D. The shell detects EOF when
+.B getline()
+returns -1.
+
+.SH PATH RESOLUTION
+When a command is entered:
+.IP 1. 3
+Check if it's a built-in command
+.IP 2. 3
+If contains '/', treat as path and execute directly
+.IP 3. 3
+Otherwise, search directories in $PATH variable
+.IP 4. 3
+Use
+.B stat()
+or
+.B access()
+to check if file exists and is executable
+.IP 5. 3
+Execute first matching executable found
+
+.SH ERROR HANDLING
+Error messages follow the format:
+.RS
+.PP
+.I program_name: line_number: command: error_message
+.RE
+.PP
+Where
+.I program_name
+is argv[0] (allowing symbolic links to work correctly).
+
+.SH EXAMPLES
+.TP
+Interactive mode:
+$ ./hsh
+($) /bin/ls -la
+($) pwd
+($) exit
+.TP
+Non-interactive mode:
+$ echo "/bin/ls" | ./hsh
+$ cat script.sh | ./hsh
+.TP
+Error example:
+$ echo "nonexistent" | ./hsh
+./hsh: 1: nonexistent: not found
+
+.SH COMPILATION
+Compile with:
+.PP
+.RS
+.nf
+gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
+.fi
+.RE
+
+.SH FILES
+.I /bin/*
+System executables referenced by the shell
+.PP
+.I /etc/passwd
+User database (for home directory resolution)
+.PP
+.I /proc/[pid]
+Process information directory
+
+.SH EXIT STATUS
+The shell returns the exit status of the last command executed,
+or the value specified to the
+.B exit
+built-in command.
+
+.SH SEE ALSO
+.BR bash (1),
+.BR sh (1),
+.BR fork (2),
+.BR execve (2),
+.BR wait (2),
+.BR getline (3)
+
+.SH BUGS
+No known major bugs. Limited feature set compared to full shells.
+Does not support pipes, redirection, or advanced scripting features.
+
+.SH AUTHOR
+Developed by Holberton School students.
+- Raghad ALmalki
+- Rama ALsheheri
