@@ -24,15 +24,15 @@ This project is inspired by the original UNIX shell created by **Ken Thompson**.
 
 ---
 
-## � Features
-✔ Interactive mode  
-✔ Non-interactive mode  
-✔ Command execution with arguments  
-✔ PATH environment variable handling  
-✔ Built-in command:
-- `exit` — exits the shell  
-✔ Error handling similar to `/bin/sh`  
-✔ No memory leaks  
+## ¨ Features
+âœ” Interactive mode  
+âœ” Non-interactive mode  
+âœ” Command execution with arguments  
+âœ” PATH environment variable handling  
+âœ” Built-in command:
+- `exit` â€” exits the shell  
+âœ” Error handling similar to `/bin/sh`  
+âœ” No memory leaks  
 
 ---
 
@@ -46,7 +46,7 @@ This project is inspired by the original UNIX shell created by **Ken Thompson**.
 
 ---
 
-### � Compilation
+### § Compilation
 ```bash
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 ```
@@ -76,21 +76,21 @@ $ echo "qwerty" | ./hsh
 ---
 
 ###  Requirements
-	•	Ubuntu 20.04 LTS
-	•	gcc compiler
-	•	Compilation flags:
-	•	-Wall
-	•	-Werror
-	•	-Wextra
-	•	-pedantic
-	•	-std=gnu89
-	•	Betty coding style
-	•	Maximum 5 functions per file
-	•	No memory leaks
+	â€¢	Ubuntu 20.04 LTS
+	â€¢	gcc compiler
+	â€¢	Compilation flags:
+	â€¢	-Wall
+	â€¢	-Werror
+	â€¢	-Wextra
+	â€¢	-pedantic
+	â€¢	-std=gnu89
+	â€¢	Betty coding style
+	â€¢	Maximum 5 functions per file
+	â€¢	No memory leaks
 
 ---
 
-### 🧩 Allowed Functions
+### ðŸ§© Allowed Functions
 
 Only approved system calls and functions are used, such as:
 `fork, execve, wait, getline, malloc, free, access, stat,
@@ -116,5 +116,5 @@ Only approved system calls and functions are used, such as:
 
 This project was developed and tested by:
 
-- **Reem Abdulhadi Alshehri**
-- **Maryam Alessa** 
+- **Raghad Almalki**
+- **Rama ALshehri**
