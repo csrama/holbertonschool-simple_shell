@@ -25,14 +25,14 @@ This project is inspired by the original UNIX shell created by **Ken Thompson**.
 ---
 
 ## ¨ Features
-âœ” Interactive mode  
-âœ” Non-interactive mode  
-âœ” Command execution with arguments  
-âœ” PATH environment variable handling  
-âœ” Built-in command:
-- `exit` â€” exits the shell  
-âœ” Error handling similar to `/bin/sh`  
-âœ” No memory leaks  
+- Interactive mode  
+- Non-interactive mode  
+- Command execution with arguments  
+- PATH environment variable handling  
+- Built-in command:
+- `exit` exits the shell  
+- Error handling similar to `/bin/sh`  
+- No memory leaks  
 
 ---
 
@@ -76,17 +76,17 @@ $ echo "qwerty" | ./hsh
 ---
 
 ###  Requirements
-	â€¢	Ubuntu 20.04 LTS
-	â€¢	gcc compiler
-	â€¢	Compilation flags:
-	â€¢	-Wall
-	â€¢	-Werror
-	â€¢	-Wextra
-	â€¢	-pedantic
-	â€¢	-std=gnu89
-	â€¢	Betty coding style
-	â€¢	Maximum 5 functions per file
-	â€¢	No memory leaks
+		Ubuntu 20.04 LTS
+		gcc compiler
+		Compilation flags:
+		-Wall
+		-Werror
+		-Wextra
+		-pedantic
+		-std=gnu89
+		Betty coding style
+		Maximum 5 functions per file
+		No memory leaks
 
 ---
 
