@@ -7,75 +7,62 @@
 extern char **environ;
 
 /**
- * trim_spaces - Remove leading and trailing spaces
- * @str: String to trim
- *
- * Return: Trimmed string
- */
-char *trim_spaces(char *str)
-{
-	char *end;
-
-	/* Remove leading spaces */
-	while (*str == ' ' || *str == '\t')
-		str++;
-
-	if (*str == 0)
-		return (str);
-
-	/* Remove trailing spaces */
-	end = str + strlen(str) - 1;
-	while (end > str && (*end == ' ' || *end == '\t'))
-		end--;
-
-	*(end + 1) = '\0';
-	return (str);
-}
-
-/**
  * main - Simple shell 0.1
  *
  * Return: Always 0 (Success)
  */
 int main(void)
 {
-	char buffer[1024];
-	char *trimmed;
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	char *clean;
 	char *args[2];
 	pid_t pid;
 	int status;
-	int interactive = isatty(STDIN_FILENO);
+	int i;
 
 	while (1)
 	{
-		/* Display prompt only in interactive mode */
-		if (interactive)
+		/* Display prompt if interactive */
+		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "#cisfun$ ", 9);
 
-		/* Read command */
-		if (fgets(buffer, sizeof(buffer), stdin) == NULL)
+		/* Read command using getline */
+		read = getline(&line, &len, stdin);
+
+		/* Handle Ctrl+D (EOF) */
+		if (read == -1)
 		{
-			/* Handle Ctrl+D */
-			if (interactive)
+			if (isatty(STDIN_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
-			break;
+			free(line);
+			exit(0);
 		}
 
-		/* Remove newline */
-		buffer[strcspn(buffer, "\n")] = '\0';
+		/* Remove newline character */
+		if (line[read - 1] == '\n')
+			line[read - 1] = '\0';
 
-		/* Trim spaces from beginning and end */
-		trimmed = trim_spaces(buffer);
+		/* Remove leading spaces */
+		clean = line;
+		while (*clean == ' ' || *clean == '\t')
+			clean++;
+
+		/* Remove trailing spaces */
+		i = strlen(clean) - 1;
+		while (i >= 0 && (clean[i] == ' ' || clean[i] == '\t'))
+			clean[i--] = '\0';
 
 		/* Skip empty lines */
-		if (strlen(trimmed) == 0)
+		if (strlen(clean) == 0)
 			continue;
 
 		/* Prepare arguments for execve */
-		args[0] = trimmed;
+		args[0] = clean;
 		args[1] = NULL;
 
-		/* Fork process */
+		/* Fork child process */
 		pid = fork();
 		if (pid < 0)
 		{
@@ -88,7 +75,7 @@ int main(void)
 			/* Execute command */
 			if (execve(args[0], args, environ) == -1)
 			{
-				fprintf(stderr, "./hsh: 1: %s: not found\n", trimmed);
+				fprintf(stderr, "./hsh: 1: %s: not found\n", clean);
 				exit(127);
 			}
 		}
@@ -99,5 +86,7 @@ int main(void)
 		}
 	}
 
+	/* Free allocated memory */
+	free(line);
 	return (0);
 }
