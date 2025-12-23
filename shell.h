@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <ctype.h>  /* نضيفها للـ isspace */
+#include <ctype.h>  
 
 /* External environment */
 extern char **environ;
@@ -16,6 +16,6 @@ extern char **environ;
 /* Function prototypes */
 void display_prompt(void);
 void execute_command(char *command);
-char *trim_spaces(char *str);  /* دالة جديدة */
+char *trim_spaces(char *str);  
 
 #endif /* SHELL_H */
