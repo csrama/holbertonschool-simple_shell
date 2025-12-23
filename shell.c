@@ -6,32 +6,24 @@
 
 extern char **environ;
 
-/**
- * main - Simple shell 0.1
- *
- * Return: Always 0 (Success)
- */
 int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
 	char *args[64];
-	char *token;
-	int i;
+	int i, j, start;
 	pid_t pid;
 	int status;
+	int empty;
 
 	while (1)
 	{
-		/* Display prompt if interactive */
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "#cisfun$ ", 9);
 
-		/* Read command using getline */
 		read = getline(&line, &len, stdin);
 
-		/* Handle Ctrl+D (EOF) */
 		if (read == -1)
 		{
 			if (isatty(STDIN_FILENO))
@@ -40,26 +32,50 @@ int main(void)
 			exit(0);
 		}
 
-		/* Remove newline character */
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		/* Skip empty lines */
-		if (strlen(line) == 0)
+		/* Check if line is empty or only spaces */
+		empty = 1;
+		for (i = 0; line[i] != '\0'; i++)
+		{
+			if (line[i] != ' ' && line[i] != '\t')
+			{
+				empty = 0;
+				break;
+			}
+		}
+		if (empty)
 			continue;
 
-		/* Split command into arguments */
+		/* Split arguments */
 		i = 0;
-		token = strtok(line, " ");
-		while (token != NULL && i < 63)
+		j = 0;
+		while (line[j] != '\0')
 		{
-			args[i] = token;
+			while (line[j] == ' ' || line[j] == '\t')
+				j++;
+			
+			if (line[j] == '\0')
+				break;
+			
+			args[i] = &line[j];
 			i++;
-			token = strtok(NULL, " ");
+			
+			while (line[j] != '\0' && line[j] != ' ' && line[j] != '\t')
+				j++;
+			
+			if (line[j] != '\0')
+			{
+				line[j] = '\0';
+				j++;
+			}
 		}
-		args[i] = NULL;  /* NULL terminate */
+		args[i] = NULL;
 
-		/* Fork child process */
+		if (args[0] == NULL)
+			continue;
+
 		pid = fork();
 		if (pid < 0)
 		{
@@ -67,23 +83,20 @@ int main(void)
 			continue;
 		}
 
-		if (pid == 0)  /* Child process */
+		if (pid == 0)
 		{
-			/* Execute command with arguments */
 			if (execve(args[0], args, environ) == -1)
 			{
 				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
 				exit(127);
 			}
 		}
-		else  /* Parent process */
+		else
 		{
-			/* Wait for child to complete */
 			wait(&status);
 		}
 	}
 
-	/* Free allocated memory */
 	free(line);
 	return (0);
 }
