@@ -90,7 +90,7 @@ $ echo "qwerty" | ./hsh
 
 ---
 
-### ðŸ§© Allowed Functions
+### Allowed Functions
 
 Only approved system calls and functions are used, such as:
 `fork, execve, wait, getline, malloc, free, access, stat,
