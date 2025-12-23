@@ -1,6 +1,34 @@
 #include "shell.h"
 
 /**
+ * trim_spaces - Removes leading and trailing spaces from a string
+ * @str: The string to trim
+ *
+ * Return: Pointer to the trimmed string
+ */
+char *trim_spaces(char *str)
+{
+	char *end;
+
+	/* Trim leading space */
+	while (isspace((unsigned char)*str))
+		str++;
+
+	if (*str == 0)  /* All spaces? */
+		return (str);
+
+	/* Trim trailing space */
+	end = str + strlen(str) - 1;
+	while (end > str && isspace((unsigned char)*end))
+		end--;
+
+	/* Write new null terminator */
+	*(end + 1) = '\0';
+
+	return (str);
+}
+
+/**
  * display_prompt - Displays the shell prompt
  *
  * Return: void
@@ -22,6 +50,13 @@ void execute_command(char *command)
 	pid_t pid;
 	int status;
 	char *args[2];
+
+	/* Trim spaces from command */
+	command = trim_spaces(command);
+
+	/* Skip if command is empty after trimming */
+	if (strlen(command) == 0)
+		return;
 
 	/* Prepare arguments for execve */
 	args[0] = command;
@@ -62,6 +97,7 @@ int main(void)
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
+	char *trimmed_line;
 
 	while (1)
 	{
@@ -84,12 +120,15 @@ int main(void)
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
+		/* Trim spaces from the line */
+		trimmed_line = trim_spaces(line);
+
 		/* Skip empty lines */
-		if (strlen(line) == 0)
+		if (strlen(trimmed_line) == 0)
 			continue;
 
 		/* Execute command */
-		execute_command(line);
+		execute_command(trimmed_line);
 	}
 
 	/* Free allocated memory */
