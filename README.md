@@ -46,7 +46,7 @@ This project is inspired by the original UNIX shell created by **Ken Thompson**.
 
 ---
 
-### § Compilation
+### Compilation
 ```bash
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 ```
