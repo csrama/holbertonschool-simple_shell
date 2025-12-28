@@ -1,95 +1,109 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#include "shell.h"
 
-extern char **environ;
-
-int main(void)
+/**
+ * get_path - Returns default PATH
+ *
+ * Return: String with PATH directories separated by ':'
+ */
+char *get_path(void)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char *args[64];
-	int i, j;
-	pid_t pid;
-	int status;
+	int i = 0;
 
-	while (1)
+	if (!environ)
+		return (NULL);
+
+	while (environ[i])
 	{
-		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, "#cisfun$ ", 9);
+		if (strncmp(environ[i], "PATH=", 5) == 0)
+			return (environ[i] + 5);
+		i++;
+	}
+	return (NULL);
+}
 
-		read = getline(&line, &len, stdin);
+/**
+ * find_path - Finds command in PATH
+ * @command: Command name
+ *
+ * Return: Full path or NULL
+ */
+char *find_path(char *command)
+{
+	char *path, *dir, *full, *path_copy;
+	struct stat st;
 
-		if (read == -1)
-		{
-			if (isatty(STDIN_FILENO))
-				write(STDOUT_FILENO, "\n", 1);
-			free(line);
-			exit(0);
-		}
+	if (!command)
+		return (NULL);
 
-		if (line[read - 1] == '\n')
-			line[read - 1] = '\0';
-
-		/* Check if line has any non-space characters */
-		for (i = 0; line[i] != '\0'; i++)
-			if (line[i] != ' ' && line[i] != '\t')
-				break;
-		
-		if (line[i] == '\0')
-			continue;
-
-		/* Split into arguments */
-		i = 0;
-		j = 0;
-		while (line[j] != '\0')
-		{
-			/* Skip spaces */
-			while (line[j] == ' ' || line[j] == '\t')
-				j++;
-			
-			if (line[j] == '\0')
-				break;
-			
-			args[i] = &line[j];
-			i++;
-			
-			/* Find end of argument */
-			while (line[j] != '\0' && line[j] != ' ' && line[j] != '\t')
-				j++;
-			
-			if (line[j] != '\0')
-			{
-				line[j] = '\0';
-				j++;
-			}
-		}
-		args[i] = NULL;
-
-		pid = fork();
-		if (pid < 0)
-		{
-			perror("fork");
-			continue;
-		}
-
-		if (pid == 0)
-		{
-			if (execve(args[0], args, environ) == -1)
-			{
-				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
-				exit(127);
-			}
-		}
-		else
-		{
-			wait(&status);
-		}
+	if (strchr(command, '/'))
+	{
+		if (stat(command, &st) == 0)
+			return (strdup(command));
+		return (NULL);
 	}
 
-	free(line);
-	return (0);
+	path = get_path();
+	if (!path || *path == '\0')
+		return (NULL);
+
+	path_copy = strdup(path);
+	if (!path_copy)
+		return (NULL);
+
+	dir = strtok(path_copy, ":");
+	while (dir)
+	{
+		full = malloc(strlen(dir) + strlen(command) + 2);
+		if (!full)
+			break;
+
+		sprintf(full, "%s/%s", dir, command);
+		if (stat(full, &st) == 0)
+		{
+			free(path_copy);
+			return (full);
+		}
+		free(full);
+		dir = strtok(NULL, ":");
+	}
+	free(path_copy);
+	return (NULL);
+}
+
+/**
+ * execute_command - Executes command if found
+ * @args: Argument list
+ */
+void execute_command(char **args)
+{
+	pid_t pid;
+	int status;
+	char *cmd_path;
+
+	if (!args || !args[0])
+		return;
+
+	cmd_path = find_path(args[0]);
+	if (!cmd_path)
+	{
+		write(STDERR_FILENO, "hsh: command not found\n", 23);
+		return;
+		fprintf(stderr, "%s: %u: %s: not found\n",
+				prog_name, line_number, args[0]);
+		exit(127);
+	}
+
+	pid = fork();
+	if (pid == 0)
+	{
+		execve(cmd_path, args, environ);
+		perror("hsh");
+		exit(EXIT_FAILURE);
+		perror(prog_name);
+		exit(1);
+	}
+	else
+		wait(&status);
+
+	free(cmd_path);
 }
