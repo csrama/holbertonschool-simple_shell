@@ -19,12 +19,12 @@ int execute_command(char **args)
 	if (!cmd_path)
 	{
 		fprintf(stderr, "%s: %u: %s: not found\n",
-			prog_name, line_number, args[0]);
+				prog_name, line_number, args[0]);
 
 		if (!isatty(STDIN_FILENO))
-			_exit(127);  /* non-interactive mode */
+			_exit(127);
 
-		return 0;  /* interactive mode: print error only */
+		return 0;
 	}
 
 	pid = fork();

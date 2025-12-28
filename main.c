@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 char *prog_name;
-unsigned int line_number = 0;
+unsigned int line_number;
 
 int main(int argc, char **argv)
 {
@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 
 	(void)argc;
 	prog_name = argv[0];
+	line_number = 0;
 
 	while (1)
 	{

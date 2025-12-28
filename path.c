@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
-/* get PATH env variable */
+/* get PATH environment variable */
 char *get_path(void)
 {
 	int i;
@@ -20,7 +21,7 @@ char *get_path(void)
 	return NULL;
 }
 
-/* find full path of command */
+/* find full path of a command */
 char *find_path(char *command)
 {
 	char *path, *path_copy, *dir, *full;
@@ -34,7 +35,7 @@ char *find_path(char *command)
 	}
 
 	path = get_path();
-	if (!path)
+	if (!path || strlen(path) == 0)
 		return NULL;
 
 	path_copy = strdup(path);
