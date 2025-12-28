@@ -1,13 +1,11 @@
 #include "shell.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <string.h>
 
-char *prog_name = NULL;
-unsigned int line_number = 0;
-
+/* execute command using fork and execve */
 int execute_command(char **args)
 {
     pid_t pid;
@@ -23,19 +21,20 @@ int execute_command(char **args)
         fprintf(stderr, "%s: %u: %s: not found\n",
                 prog_name, line_number, args[0]);
 
-        if (!isatty(STDIN_FILENO)) /* non-interactive */
+        /* Always return 127 for command not found */
+        if (!isatty(STDIN_FILENO))  /* non-interactive */
             _exit(127);
-        return 127; /* interactive */
+        return 127;  /* interactive */
     }
 
     pid = fork();
-    if (pid == 0) /* child */
+    if (pid == 0)  /* child */
     {
         execve(cmd_path, args, environ);
         perror(prog_name);
         _exit(1);
     }
-    else if (pid > 0) /* parent */
+    else if (pid > 0)  /* parent */
     {
         wait(&status);
     }
@@ -43,4 +42,3 @@ int execute_command(char **args)
     free(cmd_path);
     return WEXITSTATUS(status);
 }
-
