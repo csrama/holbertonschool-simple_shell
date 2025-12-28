@@ -29,7 +29,7 @@ char *find_path(char *command)
 
 	if (strchr(command, '/'))
 	{
-		if (stat(command, &st) == 0)
+		if (access(command, X_OK) == 0)
 			return strdup(command);
 		return NULL;
 	}
