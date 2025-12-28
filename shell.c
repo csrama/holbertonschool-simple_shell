@@ -24,7 +24,7 @@ int execute_command(char **args)
         /* Always return 127 for command not found */
         if (!isatty(STDIN_FILENO))  /* non-interactive */
             _exit(127);
-        return 127;  /* interactive */
+        return;  /* interactive */
     }
 
     pid = fork();
