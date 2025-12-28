@@ -1,9 +1,16 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-/* Add these declarations if not already present */
-char *find_command_in_path(char *command);
-int check_command_exists(char *command);
+#include <stddef.h>
+
+extern char **environ;
+
+/* path */
+char *get_path(void);
+char *find_path(char *command);
+
+/* exec */
 int execute_command(char **args);
 
-#endif /* SHELL_H */
+#endif
+
