@@ -4,45 +4,53 @@
 #include <string.h>
 #include <unistd.h>
 
-char *prog_name;
-unsigned int line_number;
-
 int main(int argc, char **argv)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char *args[64];
-	int i;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    char *args[64];
 
-	(void)argc;
-	prog_name = argv[0];
-	line_number = 0;
+    prog_name = argv[0];
+    line_number = 0;
 
-	while (1)
-	{
-		line_number++;
+    while (1)
+    {
+        line_number++;
+        if (isatty(STDIN_FILENO))
+            printf("($) ");
 
-		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, "($) ", 4);
+        read = getline(&line, &len, stdin);
+        if (read == -1)
+        {
+            free(line);
+            exit(0);
+        }
 
-		read = getline(&line, &len, stdin);
-		if (read == -1)
-		{
-			free(line);
-			exit(0);
-		}
+        line[read - 1] = '\0'; /* remove newline */
 
-		line[strcspn(line, "\n")] = '\0';
+        if (strlen(line) == 0)
+            continue;
 
-		i = 0;
-		args[i] = strtok(line, " ");
-		while (args[i])
-			args[++i] = strtok(NULL, " ");
+        /* parse arguments */
+        int i = 0;
+        char *token = strtok(line, " ");
+        while (token)
+        {
+            args[i++] = token;
+            token = strtok(NULL, " ");
+        }
+        args[i] = NULL;
 
-		if (args[0])
-			execute_command(args);
-	}
-	return (0);
+        if (strcmp(args[0], "exit") == 0)
+        {
+            free(line);
+            exit(0);
+        }
+
+        execute_command(args);
+    }
+
+    return 0;
 }
 
