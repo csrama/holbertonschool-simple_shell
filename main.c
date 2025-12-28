@@ -4,11 +4,10 @@
 #include <string.h>
 #include <unistd.h>
 
-/**
- * main - entry point of the simple shell
- * Return: 0
- */
-int main(void)
+char *prog_name;
+unsigned int line_number = 0;
+
+int main(int argc, char **argv)
 {
 	char *line = NULL;
 	size_t len = 0;
@@ -16,8 +15,13 @@ int main(void)
 	char *args[64];
 	int i;
 
+	(void)argc;
+	prog_name = argv[0];
+
 	while (1)
 	{
+		line_number++;
+
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "($) ", 4);
 
@@ -28,16 +32,12 @@ int main(void)
 			exit(0);
 		}
 
-		/* remove newline */
 		line[strcspn(line, "\n")] = '\0';
 
 		i = 0;
 		args[i] = strtok(line, " ");
 		while (args[i])
-		{
-			i++;
-			args[i] = strtok(NULL, " ");
-		}
+			args[++i] = strtok(NULL, " ");
 
 		if (args[0])
 			execute_command(args);
