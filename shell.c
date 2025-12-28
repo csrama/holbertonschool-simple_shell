@@ -12,11 +12,11 @@ int execute_command(char **args)
     int status;
     char *cmd_path;
 
-    if (!args || !args[0])
+    if (args == NULL || args[0] == NULL)
         return 0;
 
     cmd_path = find_path(args[0]);
-    if (!cmd_path)
+    if (!cmd_path == NULL)
     {
         fprintf(stderr, "%s: %u: %s: not found\n",
                 prog_name, line_number, args[0]);
@@ -24,21 +24,31 @@ int execute_command(char **args)
         /* Always return 127 for command not found */
         if (!isatty(STDIN_FILENO))  /* non-interactive */
             _exit(127);
-        return;  /* interactive */
+        return (127);  /* interactive */
     }
 
     pid = fork();
-    if (pid == 0)  /* child */
+    if (pid == -1)  /* child */
+    {
+        perror(prog_name);
+        free(cmd_path);
+        return(1);
+    }
+    if (pid == 0)  /* parent */
     {
         execve(cmd_path, args, environ);
         perror(prog_name);
-        _exit(1);
-    }
-    else if (pid > 0)  /* parent */
-    {
-        wait(&status);
     }
 
     free(cmd_path);
-    return WEXITSTATUS(status);
+    _exit(126);
+}
+/* parent */
+	waitpid(pid, &status, 0);
+/* free(cmd_path); /* CHANGED */
+
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+
+	return (1);
 }
