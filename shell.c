@@ -1,54 +1,94 @@
-#include "shell.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 
-/* Globals for checker compliance */
-char *prog_name = "hsh";
-unsigned int line_number = 1;
+extern char **environ;
 
-/* Execute command using fork + execve */
-int execute_command(char **args)
+int main(void)
 {
-    pid_t pid;
-    int status;
-    char *cmd_path;
+char *line = NULL;
+size_t len = 0;
+ssize_t read;
+char *args[64];
+int i, j;
+pid_t pid;
+int status;
+while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, "#cisfun$ ", 9);
 
-    if (!args || !args[0])
-        return 0;
+		read = getline(&line, &len, stdin);
 
-    cmd_path = find_path(args[0]);
-    if (!cmd_path)
-    {
-        fprintf(stderr, "%s: %u: %s: not found\n",
-                prog_name, line_number, args[0]);
+		if (read == -1)
+		{
+			if (isatty(STDIN_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
+			free(line);
+			exit(0);
+		}
 
-        if (!isatty(STDIN_FILENO))
-            _exit(127);  /* non-interactive mode */
+		if (line[read - 1] == '\n')
+			line[read - 1] = '\0';
 
-        return 0;  /* interactive mode: error only */
-    }
+		/* Check if line has any non-space characters */
+		for (i = 0; line[i] != '\0'; i++)
+			if (line[i] != ' ' && line[i] != '\t')
+				break;
+		
+		if (line[i] == '\0')
+			continue;
 
-    pid = fork();
-    if (pid == -1)
-    {
-        perror(prog_name);
-        free(cmd_path);
-        return 1;
-    }
+		/* Split into arguments */
+		i = 0;
+		j = 0;
+		while (line[j] != '\0')
+		{
+			/* Skip spaces */
+			while (line[j] == ' ' || line[j] == '\t')
+				j++;
+			
+			if (line[j] == '\0')
+				break;
+			
+			args[i] = &line[j];
+			i++;
+			
+			/* Find end of argument */
+			while (line[j] != '\0' && line[j] != ' ' && line[j] != '\t')
+				j++;
+			
+			if (line[j] != '\0')
+			{
+				line[j] = '\0';
+				j++;
+			}
+		}
+		args[i] = NULL;
 
-    if (pid == 0) /* child */
-    {
-        execve(cmd_path, args, environ);
-        perror(prog_name);
-        free(cmd_path);
-        _exit(126);
-    }
+		pid = fork();
+		if (pid < 0)
+		{
+			perror("fork");
+			continue;
+		}
 
-    waitpid(pid, &status, 0);
-    free(cmd_path);
+		if (pid == 0)
+		{
+			if (execve(args[0], args, environ) == -1)
+			{
+				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+				exit(127);
+			}
+		}
+		else
+		{
+			wait(&status);
+		}
+	}
 
-    return 0;
+	free(line);
+	return (0);
 }
