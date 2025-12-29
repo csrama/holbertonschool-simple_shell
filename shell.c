@@ -1,110 +1,87 @@
 #include "shell.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/wait.h>
 
-char *prog_name = "hsh";
-unsigned int line_number = 0;
+char *prog_name;
+unsigned int line_number;
 
+/**
+ * execute_command - Forks and executes a command if found
+ * @args: array of arguments
+ * Return: status code
+ */
 int execute_command(char **args)
 {
 	pid_t pid;
 	int status;
 	char *cmd_path;
 
-	if (!args || !args[0])
-		return 0;
-
 	cmd_path = find_path(args[0]);
 	if (!cmd_path)
 	{
 		fprintf(stderr, "%s: %u: %s: not found\n",
 				prog_name, line_number, args[0]);
-		return 127;
+		return (127);
 	}
 
 	pid = fork();
-	if (pid == -1)
+	if (pid == 0)
 	{
-		perror(prog_name);
-		free(cmd_path);
-		return 1;
+		if (execve(cmd_path, args, environ) == -1)
+		{
+			perror(prog_name);
+			free(cmd_path);
+			exit(127);
+		}
 	}
-
-	if (pid == 0) /* child */
+	else
 	{
-		execve(cmd_path, args, environ);
-		perror(prog_name);
+		wait(&status);
 		free(cmd_path);
-		_exit(126);
 	}
-
-	/* parent */
-	waitpid(pid, &status, 0);
-	free(cmd_path);
-	return 0;
+	return (0);
 }
 
-int main(void)
+/**
+ * main - entry point for the simple shell
+ * @ac: arg count
+ * @av: arg vector
+ * Return: 0 on success
+ */
+int main(int ac, char **av)
 {
 	char *line = NULL;
 	size_t len = 0;
-	ssize_t read;
+	ssize_t nread;
 	char *args[64];
-	int i, j;
+	int i;
+	(void)ac;
+
+	prog_name = av[0];
+	line_number = 0;
 
 	while (1)
 	{
 		line_number++;
 		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, "#cisfun$ ", 9);
+			write(STDOUT_FILENO, "($) ", 4);
 
-		read = getline(&line, &len, stdin);
-		if (read == -1)
+		nread = getline(&line, &len, stdin);
+		if (nread == -1)
 		{
 			if (isatty(STDIN_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
-			free(line);
-			exit(0);
+			break;
 		}
+		if (line[nread - 1] == '\n')
+			line[nread - 1] = '\0';
 
-		if (line[read - 1] == '\n')
-			line[read - 1] = '\0';
-
-		/* skip empty lines */
-		for (i = 0; line[i] != '\0'; i++)
-			if (line[i] != ' ' && line[i] != '\t')
-				break;
-		if (line[i] == '\0')
-			continue;
-
-		/* tokenize line into args */
 		i = 0;
-		j = 0;
-		while (line[j] != '\0')
-		{
-			while (line[j] == ' ' || line[j] == '\t')
-				j++;
-			if (line[j] == '\0')
-				break;
+		args[i] = strtok(line, " \t");
+		while (args[i])
+			args[++i] = strtok(NULL, " \t");
 
-			args[i++] = &line[j];
-
-			while (line[j] != '\0' && line[j] != ' ' && line[j] != '\t')
-				j++;
-			if (line[j] != '\0')
-			{
-				line[j] = '\0';
-				j++;
-			}
-		}
-		args[i] = NULL;
-
-		execute_command(args);
+		if (args[0])
+			execute_command(args);
 	}
-
 	free(line);
-	return 0;
+	return (0);
 }
