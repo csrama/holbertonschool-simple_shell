@@ -6,7 +6,7 @@
 
 char *prog_name;
 unsigned int line_number;
-
+int status = 0;
 int main(int argc, char **argv)
 {
 	char *line = NULL;
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 		if (read == -1)
 		{
 			free(line);
-			exit(0);
+			return(status);
 		}
 
 		line[strcspn(line, "\n")] = '\0';
@@ -41,8 +41,8 @@ int main(int argc, char **argv)
 			args[++i] = strtok(NULL, " ");
 
 		if (args[0])
-			execute_command(args);
+			status = execute_command(args);
 	}
-	return (0);
+	return (status);
 }
 

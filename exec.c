@@ -15,7 +15,7 @@ int run_external(char **argv, char **envp, const char *progname, int cmd_no)
     {
         fprintf(stderr, "%s: %d: %s: not found\n",
                 progname ? progname : "hsh", cmd_no, argv[0]);
-        return 127;
+	return (127);
     }
 
     pid = fork();
