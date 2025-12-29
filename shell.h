@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <stddef.h>
 
 /* Global environment */
 extern char **environ;
@@ -20,5 +21,5 @@ extern unsigned int line_number;
 int execute_command(char **args);
 char *find_path(const char *command);
 char *get_path(void);
-
+int resolve_command(char *cmd, char *full, size_t size, char **envp);
 #endif

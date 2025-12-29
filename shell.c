@@ -1,8 +1,5 @@
 #include "shell.h"
 
-char *prog_name;
-unsigned int line_number;
-
 /**
  * execute_command - Forks and executes a command if found
  * @args: array of arguments
@@ -46,7 +43,7 @@ int execute_command(char **args)
  * @av: arg vector
  * Return: 0 on success
  */
-int main(int ac, char **av)
+int shell_loop(int ac, char **av)
 {
 	char *line = NULL;
 	size_t len = 0;

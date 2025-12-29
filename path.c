@@ -57,3 +57,17 @@ char *find_path(const char *command)
 	free(path_copy);
 	return (NULL);
 }
+int resolve_command(char *cmd, char *full, size_t size, char **envp)
+{
+    char *p;
+
+    (void)envp;
+    p = find_path(cmd);
+    if (!p)
+        return (0);
+
+    strncpy(full, p, size - 1);
+    full[size - 1] = '\0';
+    free(p);
+    return (1);
+}
