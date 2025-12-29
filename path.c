@@ -1,69 +1,49 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <unistd.h>
+#include <stdio.h>
 
-/* get PATH environment variable */
-char *get_path(void)
-{
-	int i;
-
-	if (!environ)
-	#include "shell.h"	return NULL;
-
-	for (i = 0; environ[i]; i++)
-	{
-		if (strncmp(environ[i], "PATH=", 5) == 0)
-			return environ[i] + 5;
-	}
-	return NULL;
-}
-
-/* find full path of a command */
 char *find_path(char *command)
 {
-	char *path, *path_copy, *dir, *full;
-	struct stat st;
+    char *path, *path_copy, *dir, *full_path;
+    size_t len;
 
-	if (strchr(command, '/'))
-	{
-		if (access(command, X_OK) == 0)
-			return strdup(command);
-		return NULL;
-	}
+    if (!command)
+        return NULL;
 
-	path = get_path();
-	if (!path || strlen(path) == 0)
-		return NULL;
+    /* إذا الأمر فيه / ننفذه مباشرة */
+    if (strchr(command, '/'))
+        return (access(command, X_OK) == 0 ? strdup(command) : NULL);
 
-	path_copy = strdup(path);
-	if (!path_copy)
-		return NULL;
+    path = getenv("PATH");
+    if (!path || path[0] == '\0')
+        return NULL;
 
-	dir = strtok(path_copy, ":");
-	while (dir)
-	{
-		full = malloc(strlen(dir) + strlen(command) + 2);
-		if (!full)
-		{
-			free(path_copy);
-			return NULL;
-		}
+    path_copy = strdup(path);
+    if (!path_copy)
+        return NULL;
 
-		sprintf(full, "%s/%s", dir, command);
+    dir = strtok(path_copy, ":");
+    while (dir)
+    {
+        len = strlen(dir) + strlen(command) + 2;
+        full_path = malloc(len);
+        if (!full_path)
+            break;
 
-		if (stat(full, &st) == 0)
-		{
-			free(path_copy);
-			return full;
-		}
+        snprintf(full_path, len, "%s/%s", dir, command);
 
-		free(full);
-		dir = strtok(NULL, ":");
-	}
+        if (access(full_path, X_OK) == 0)
+        {
+            free(path_copy);
+            return full_path;
+        }
 
-	free(path_copy);
-	return NULL;
+        free(full_path);
+        dir = strtok(NULL, ":");
+    }
+
+    free(path_copy);
+    return NULL;
 }
 
