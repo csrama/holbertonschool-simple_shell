@@ -1,3 +1,4 @@
+#include "shell.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -11,11 +12,10 @@ char *find_path(char *command)
     if (!command)
         return NULL;
 
-    /* إذا الأمر فيه / ننفذه مباشرة */
     if (strchr(command, '/'))
         return (access(command, X_OK) == 0 ? strdup(command) : NULL);
 
-    path = getenv("PATH");
+    path = get_path_value();
     if (!path || path[0] == '\0')
         return NULL;
 
