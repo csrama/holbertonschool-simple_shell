@@ -1,51 +1,68 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
-#include <stdio.h>
-#include "shell.h"
 
-/* Search PATH for the command */
-char *find_path(char *command)
+/* get PATH environment variable */
+char *get_path(void)
 {
-    char *path, *path_copy, *dir, *full_path;
-    size_t len;
+	int i;
 
-    if (!command)
-        return NULL;
+	if (!environ)
+	#include "shell.h"	return NULL;
 
-    /* If command contains '/', treat as path */
-    if (strchr(command, '/'))
-        return (access(command, X_OK) == 0 ? strdup(command) : NULL);
-
-    path = get_path_value();
-    if (!path || path[0] == '\0')
-        return NULL;
-
-    path_copy = strdup(path);
-    if (!path_copy)
-        return NULL;
-
-    dir = strtok(path_copy, ":");
-    while (dir)
-    {
-        len = strlen(dir) + strlen(command) + 2;
-        full_path = malloc(len);
-        if (!full_path)
-            break;
-
-        snprintf(full_path, len, "%s/%s", dir, command);
-
-        if (access(full_path, X_OK) == 0)
-        {
-            free(path_copy);
-            return full_path;
-        }
-
-        free(full_path);
-        dir = strtok(NULL, ":");
-    }
-
-    free(path_copy);
-    return NULL;
+	for (i = 0; environ[i]; i++)
+	{
+		if (strncmp(environ[i], "PATH=", 5) == 0)
+			return environ[i] + 5;
+	}
+	return NULL;
 }
 
+/* find full path of a command */
+char *find_path(char *command)
+{
+	char *path, *path_copy, *dir, *full;
+	struct stat st;
+
+	if (strchr(command, '/'))
+	{
+		if (access(command, X_OK) == 0)
+			return strdup(command);
+		return NULL;
+	}
+
+	path = get_path();
+	if (!path || strlen(path) == 0)
+		return NULL;
+
+	path_copy = strdup(path);
+	if (!path_copy)
+		return NULL;
+
+	dir = strtok(path_copy, ":");
+	while (dir)
+	{
+		full = malloc(strlen(dir) + strlen(command) + 2);
+		if (!full)
+		{
+			free(path_copy);
+			return NULL;
+		}
+
+		sprintf(full, "%s/%s", dir, command);
+
+		if (stat(full, &st) == 0)
+		{
+			free(path_copy);
+			return full;
+		}
+
+		free(full);
+		dir = strtok(NULL, ":");
+	}
+
+	free(path_copy);
+	return NULL;
+}

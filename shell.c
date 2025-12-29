@@ -1,43 +1,53 @@
 #include "shell.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 #include <string.h>
+#include <errno.h>
 
-/* Execute a command */
+/* execute command using fork and execve */
 int execute_command(char **args)
 {
     pid_t pid;
+    int status;
     char *cmd_path;
 
     if (!args || !args[0])
         return 0;
-
-    /* If command contains '/' -> try it directly */
-    if (strchr(args[0], '/'))
+   
+    /*´ INSERT THIS BLOC */
+    path = getenv("PATH");
+    if (path && path[0] == '\0')
     {
-        if (access(args[0], X_OK) != 0)
-        {
-            fprintf(stderr, "%s: %u: %s: not found\n",
-                    prog_name, line_number, args[0]);
-            return 127;
-        }
-        cmd_path = strdup(args[0]);
+        fprintf(stderr, "%s: %u: %s: not found\n",
+                prog_name, line_number, args[0]);
+
+        if (!isatty(STDIN_FILENO))
+            _exit(127);
+
+        return 0;
     }
-    else
+    /*´ END OF INSERT */
+
+
+    cmd_path = find_path(args[0]);
+    if (!cmd_path)
     {
-        /* Search PATH */
-        cmd_path = find_path(args[0]);
-        if (!cmd_path)
-        {
-            fprintf(stderr, "%s: %u: %s: not found\n",
-                    prog_name, line_number, args[0]);
-            return 127;
-        }
+        /* Command not found */
+        fprintf(stderr, "%s: %u: %s: not found\n",
+                prog_name, line_number, args[0]);
+
+        /* Non-interactive: exit with 127 */
+        if (!isatty(STDIN_FILENO))
+            _exit(127);
+
+        /* Interactive: just print error, do NOT fork */
+        return 0;
     }
 
+    /* Only fork if command exists */
     pid = fork();
     if (pid == -1)
     {
@@ -46,7 +56,7 @@ int execute_command(char **args)
         return 1;
     }
 
-    if (pid == 0)
+    if (pid == 0) /* Child process */
     {
         execve(cmd_path, args, environ);
         perror(prog_name);
@@ -54,8 +64,11 @@ int execute_command(char **args)
         _exit(126);
     }
 
-    wait(NULL);
+    /* Parent process */
+    waitpid(pid, &status, 0);
     free(cmd_path);
+
     return 0;
-}
+} 
+
 
