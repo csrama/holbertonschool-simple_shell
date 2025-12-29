@@ -16,6 +16,21 @@ int execute_command(char **args)
 
     if (!args || !args[0])
         return 0;
+   
+    /*´ INSERT THIS BLOC */
+    path = getenv("PATH");
+    if (path && path[0] == '\0')
+    {
+        fprintf(stderr, "%s: %u: %s: not found\n",
+                prog_name, line_number, args[0]);
+
+        if (!isatty(STDIN_FILENO))
+            _exit(127);
+
+        return 0;
+    }
+    /*´ END OF INSERT */
+
 
     cmd_path = find_path(args[0]);
     if (!cmd_path)
