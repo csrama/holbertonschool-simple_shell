@@ -1,8 +1,9 @@
 #include "shell.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/wait.h>
-#include <errno.h>
+#include <unistd.h>
 
 int execute_command(char **args)
 {
@@ -13,8 +14,7 @@ int execute_command(char **args)
     if (!args || !args[0])
         return 0;
 
-    /* ✅ الحالة المهمة: PATH موجود لكنه فاضي */
-    path = getenv("PATH");
+    path = get_path_value();
     if (path && path[0] == '\0')
     {
         fprintf(stderr, "%s: %u: %s: not found\n",
