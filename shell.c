@@ -15,7 +15,7 @@ int execute_command(char **args)
     if (!args || !args[0])
         return 0;
 
-    /* If command contains '/' -> treat it as path, do NOT search PATH */
+    /* If command contains '/' -> try it directly */
     if (strchr(args[0], '/'))
     {
         if (access(args[0], X_OK) != 0)
@@ -28,7 +28,7 @@ int execute_command(char **args)
     }
     else
     {
-        /* Search PATH for the command */
+        /* Search PATH */
         cmd_path = find_path(args[0]);
         if (!cmd_path)
         {
@@ -38,7 +38,6 @@ int execute_command(char **args)
         }
     }
 
-    /* Fork and execute */
     pid = fork();
     if (pid == -1)
     {

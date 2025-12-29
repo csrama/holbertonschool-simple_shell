@@ -1,4 +1,5 @@
 #include <string.h>
+#include "shell.h"
 
 extern char **environ;
 
@@ -14,7 +15,7 @@ char *get_path_value(void)
     while (environ[i])
     {
         if (strncmp(environ[i], "PATH=", len) == 0)
-            return environ[i] + len;  /* return pointer after "PATH=" */
+            return environ[i] + len;
         i++;
     }
     return NULL;

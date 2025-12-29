@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "shell.h"
 
+/* Search PATH for the command */
 char *find_path(char *command)
 {
     char *path, *path_copy, *dir, *full_path;
@@ -12,6 +13,7 @@ char *find_path(char *command)
     if (!command)
         return NULL;
 
+    /* If command contains '/', treat as path */
     if (strchr(command, '/'))
         return (access(command, X_OK) == 0 ? strdup(command) : NULL);
 

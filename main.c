@@ -1,32 +1,33 @@
-#include "shell.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "shell.h"
 
-char *prog_name;
+char *prog_name = "hsh";
 unsigned int line_number = 0;
 
-int main(int argc, char **argv)
+int main(void)
 {
     char *line = NULL;
     size_t len = 0;
-    char *args[2];
-    ssize_t read;
+    char **args;
+    ssize_t nread;
 
-    (void)argc;
-    prog_name = argv[0];
-
-    while ((read = getline(&line, &len, stdin)) != -1)
+    while (1)
     {
+        printf("$ ");
+        nread = getline(&line, &len, stdin);
+        if (nread == -1)
+            break;
+
         line_number++;
-
-        if (read > 1)
+        args = tokenize(line);
+        if (args)
         {
-            line[strcspn(line, "\n")] = '\0';
-            args[0] = line;
-            args[1] = NULL;
-
             execute_command(args);
+
+            for (int i = 0; args[i]; i++)
+                free(args[i]);
+            free(args);
         }
     }
 
