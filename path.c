@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdio.h>
 
 char *find_path(char *command)
 {
     char *path, *path_copy, *dir, *full_path;
     size_t len;
 
+    /* لو فيه / ننفذ مباشرة */
     if (strchr(command, '/'))
         return (access(command, X_OK) == 0 ? strdup(command) : NULL);
 
@@ -16,8 +18,10 @@ char *find_path(char *command)
         return NULL;
 
     path_copy = strdup(path);
-    dir = strtok(path_copy, ":");
+    if (!path_copy)
+        return NULL;
 
+    dir = strtok(path_copy, ":");
     while (dir)
     {
         len = strlen(dir) + strlen(command) + 2;
@@ -25,7 +29,7 @@ char *find_path(char *command)
         if (!full_path)
             break;
 
-        sprintf(full_path, "%s/%s", dir, command);
+        snprintf(full_path, len, "%s/%s", dir, command);
 
         if (access(full_path, X_OK) == 0)
         {
