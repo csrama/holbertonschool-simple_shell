@@ -2,7 +2,7 @@
 
 extern char **environ;
 
-/* Returns the value of the PATH environment variable, or NULL if not found */
+/* Return the value of PATH, or NULL if not found */
 char *get_path_value(void)
 {
     int i = 0;
@@ -14,7 +14,7 @@ char *get_path_value(void)
     while (environ[i])
     {
         if (strncmp(environ[i], "PATH=", len) == 0)
-            return environ[i] + len;  /* return pointer just after "PATH=" */
+            return environ[i] + len;  /* return pointer after "PATH=" */
         i++;
     }
     return NULL;
