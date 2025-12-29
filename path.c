@@ -22,11 +22,12 @@ char *get_path(void)
 }
 
 /* find full path of a command */
-char *find_path(char *command)
+char *find_path(const char *command)
 {
 	char *path, *path_copy, *dir, *full;
 	struct stat st;
 
+	/* If command contains '/' treat it as absolute or relative */
 	if (strchr(command, '/'))
 	{
 		if (stat(command, &st) == 0)
