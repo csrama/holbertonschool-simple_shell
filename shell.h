@@ -1,17 +1,16 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <stdio.h>
+#include <stddef.h>
 
+extern char **environ;
 extern char *prog_name;
 extern unsigned int line_number;
-extern char **environ;
 
-char *find_path(char *command);
-char *get_path_value(void);
+/* Execute a command */
 int execute_command(char **args);
-char *trim_spaces(char *str);
-char **tokenize(char *line);
+
+/* Find full path of a command */
+char *find_path(const char *command);
 
 #endif
-

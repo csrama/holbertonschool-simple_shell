@@ -4,10 +4,12 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <errno.h>
 
-/* execute command using fork and execve */
+/* Globals for checker compliance */
+char *prog_name = "hsh";
+unsigned int line_number = 1;
+
+/* Execute command using fork + execve */
 int execute_command(char **args)
 {
     pid_t pid;
@@ -16,38 +18,19 @@ int execute_command(char **args)
 
     if (!args || !args[0])
         return 0;
-   
-    /*´ INSERT THIS BLOC */
-    path = getenv("PATH");
-    if (path && path[0] == '\0')
-    {
-        fprintf(stderr, "%s: %u: %s: not found\n",
-                prog_name, line_number, args[0]);
-
-        if (!isatty(STDIN_FILENO))
-            _exit(127);
-
-        return 0;
-    }
-    /*´ END OF INSERT */
-
 
     cmd_path = find_path(args[0]);
     if (!cmd_path)
     {
-        /* Command not found */
         fprintf(stderr, "%s: %u: %s: not found\n",
                 prog_name, line_number, args[0]);
 
-        /* Non-interactive: exit with 127 */
         if (!isatty(STDIN_FILENO))
-            _exit(127);
+            _exit(127);  /* non-interactive mode */
 
-        /* Interactive: just print error, do NOT fork */
-        return 0;
+        return 0;  /* interactive mode: error only */
     }
 
-    /* Only fork if command exists */
     pid = fork();
     if (pid == -1)
     {
@@ -56,7 +39,7 @@ int execute_command(char **args)
         return 1;
     }
 
-    if (pid == 0) /* Child process */
+    if (pid == 0) /* child */
     {
         execve(cmd_path, args, environ);
         perror(prog_name);
@@ -64,11 +47,8 @@ int execute_command(char **args)
         _exit(126);
     }
 
-    /* Parent process */
     waitpid(pid, &status, 0);
     free(cmd_path);
 
     return 0;
-} 
-
-
+}
