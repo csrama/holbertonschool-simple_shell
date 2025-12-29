@@ -13,4 +13,7 @@ int execute_command(char **args);
 /* Find full path of a command */
 char *find_path(const char *command);
 
+/* Get PATH value */
+char *get_path(void);
+
 #endif
