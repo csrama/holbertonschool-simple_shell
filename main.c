@@ -2,47 +2,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 char *prog_name;
-unsigned int line_number;
+unsigned int line_number = 0;
 
 int main(int argc, char **argv)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char *args[64];
-	int i;
+    char *line = NULL;
+    size_t len = 0;
+    char *args[2];
+    ssize_t read;
 
-	(void)argc;
-	prog_name = argv[0];
-	line_number = 0;
+    (void)argc;
+    prog_name = argv[0];
 
-	while (1)
-	{
-		line_number++;
+    while ((read = getline(&line, &len, stdin)) != -1)
+    {
+        line_number++;
 
-		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, "($) ", 4);
+        if (read > 1)
+        {
+            line[strcspn(line, "\n")] = '\0';
+            args[0] = line;
+            args[1] = NULL;
 
-		read = getline(&line, &len, stdin);
-		if (read == -1)
-		{
-			free(line);
-			exit(0);
-		}
+            execute_command(args);
+        }
+    }
 
-		line[strcspn(line, "\n")] = '\0';
-
-		i = 0;
-		args[i] = strtok(line, " ");
-		while (args[i])
-			args[++i] = strtok(NULL, " ");
-
-		if (args[0])
-			execute_command(args);
-	}
-	return (0);
+    free(line);
+    return 0;
 }
 

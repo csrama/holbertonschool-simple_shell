@@ -1,53 +1,35 @@
 #include "shell.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <string.h>
 #include <errno.h>
 
-/* execute command using fork and execve */
 int execute_command(char **args)
 {
     pid_t pid;
-    int status;
     char *cmd_path;
+    char *path;
 
     if (!args || !args[0])
         return 0;
-   
-    /*� INSERT THIS BLOC */
+
+    /* ✅ الحالة المهمة: PATH موجود لكنه فاضي */
     path = getenv("PATH");
     if (path && path[0] == '\0')
     {
         fprintf(stderr, "%s: %u: %s: not found\n",
                 prog_name, line_number, args[0]);
-
-        if (!isatty(STDIN_FILENO))
-            _exit(127);
-
-        return 0;
+        return 127;
     }
-    /*� END OF INSERT */
-
 
     cmd_path = find_path(args[0]);
     if (!cmd_path)
     {
-        /* Command not found */
         fprintf(stderr, "%s: %u: %s: not found\n",
                 prog_name, line_number, args[0]);
-
-        /* Non-interactive: exit with 127 */
-        if (!isatty(STDIN_FILENO))
-            _exit(127);
-
-        /* Interactive: just print error, do NOT fork */
-        return 0;
+        return 127;
     }
 
-    /* Only fork if command exists */
     pid = fork();
     if (pid == -1)
     {
@@ -56,7 +38,7 @@ int execute_command(char **args)
         return 1;
     }
 
-    if (pid == 0) /* Child process */
+    if (pid == 0)
     {
         execve(cmd_path, args, environ);
         perror(prog_name);
@@ -64,9 +46,8 @@ int execute_command(char **args)
         _exit(126);
     }
 
-    /* Parent process */
-    waitpid(pid, &status, 0);
+    wait(NULL);
     free(cmd_path);
-
     return 0;
 }
+
