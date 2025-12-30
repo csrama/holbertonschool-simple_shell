@@ -82,14 +82,3 @@ int shell_loop(int ac, char **av)
 	free(line);
 	return (0);
 }
-
-/**
- * main - Entry point
- * @ac: Argument count
- * @av: Argument vector
- * Return: Exit status
- */
-int main(int ac, char **av)
-{
-	return shell_loop(ac, av);
-}
