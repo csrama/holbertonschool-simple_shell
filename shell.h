@@ -22,4 +22,6 @@ int execute_command(char **args);
 char *find_path(const char *command);
 char *get_path(void);
 int resolve_command(char *cmd, char *full, size_t size, char **envp);
+/* add this prototype */
+int check_builtin(char **args);
 #endif
