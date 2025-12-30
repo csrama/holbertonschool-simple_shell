@@ -38,7 +38,7 @@ int execute_command(char **args)
 }
 
 /**
- * main - entry point for the simple shell
+ * shell_loop - entry point for the simple shell
  * @ac: arg count
  * @av: arg vector
  * Return: 0 on success
@@ -68,6 +68,7 @@ int shell_loop(int ac, char **av)
 				write(STDOUT_FILENO, "\n", 1);
 			break;
 		}
+
 		if (line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
 
@@ -76,9 +77,17 @@ int shell_loop(int ac, char **av)
 		while (args[i])
 			args[++i] = strtok(NULL, " \t");
 
+		/* exit built-in: exits the shell */
+		if (args[0] && strcmp(args[0], "exit") == 0)
+		{
+			free(line);
+			exit(0);
+		}
+
 		if (args[0])
 			execute_command(args);
 	}
+
 	free(line);
 	return (0);
 }
