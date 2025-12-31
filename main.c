@@ -40,11 +40,11 @@ int main(int argc, char **argv)
 		while (args[i])
 			args[++i] = strtok(NULL, " \t");
 
-		/* ✅ EXIT BUILT-IN — MUST BE HERE */
+		/* EXIT BUILT-IN — MUST BE HERE */
 		if (args[0] && strcmp(args[0], "exit") == 0)
 		{
 			free(line);
-			exit(0);
+			exit(status);
 		}
 
 		if (args[0])
