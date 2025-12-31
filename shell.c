@@ -33,8 +33,11 @@ int execute_command(char **args)
 	{
 		wait(&status);
 		free(cmd_path);
+
+		 if (WIFEXITED(status))
+        return (WEXITSTATUS(status));
 	}
-	return (0);
+	return (1);
 }
 
 /**
