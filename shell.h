@@ -21,7 +21,7 @@ extern unsigned int line_number;
 /* FUNCTION PROTOTYPES */
 ssize_t _getline(char **lineptr, size_t *n);
 int execute_command(char **args);
-char *_getenv(const char *name);
+char *find_path(char *command);
 char *_which(char *command);
 
 #endif /* SHELL_H */
