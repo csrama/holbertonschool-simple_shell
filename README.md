@@ -112,10 +112,9 @@ Only approved system calls and functions are used, such as:
 | `Simple shell 0.4`   | Implement exit built-in                |
 | `Simple shell 1.0`   | Implement env built-in                 |
 
+```mermaid
 flowchart TD
-  ```mermaid
-
-	A["Start hsh"]
+    A["Start hsh"]
     B["Show prompt"]
     C["Read input"]
     D{"EOF?"}
@@ -139,7 +138,7 @@ flowchart TD
     F -->|No| H --> I
     I -->|No| M
     I -->|Yes| J --> K --> L --> B
-
+```
 
 
 ##  Contributors
