@@ -26,7 +26,7 @@ int main(int argc, char **argv)
         if (isatty(STDIN_FILENO))
             write(STDOUT_FILENO, "($) ", 4);
 
-        read = getline(&line, &len, stdin);
+            read = _getline(&line, &len);
         if (read == -1)
         {
             free(line);
