@@ -113,41 +113,35 @@ Only approved system calls and functions are used, such as:
 | `Simple shell 1.0`   | Implement env built-in                 |
 
 flowchart TD
-    A[Start hsh] --> B{Interactive mode?}
+    A[Start hsh]
+    B[Display prompt]
+    C[Read input]
+    D{EOF}
+    E[Parse input]
+    F{Built in}
+    G[Execute built in]
+    H[Resolve command]
+    I{Found}
+    J[Fork]
+    K[execve]
+    L[waitpid]
+    M[Exit shell]
 
-    B -->|Yes| C[Display prompt]
-    B -->|No| D[Skip prompt]
-
-    C --> E[Read input - getline]
-    D --> E
-
-    E --> F{EOF - Ctrl D?}
-
-    F -->|Yes| G[Free memory]
-    G --> H[Exit shell]
-
-    F -->|No| I[Parse input into argv]
-
-    I --> J{Built in command?}
-
-    J -->|Yes| K[Execute built in - exit or env]
-    K --> H
-
-    J -->|No| L[Resolve command path]
-
-    L --> M{Command found?}
-
-    M -->|No| N[Print error]
-    N --> O[Set exit status 127]
-    O --> P[Free memory]
-    P --> E
-
-    M -->|Yes| R[Fork process]
-    R --> S[execve]
-    S --> T[waitpid]
-    T --> U[Get exit status]
-    U --> P
-
+    A --> B
+    B --> C
+    C --> D
+    D -->|Yes| M
+    D -->|No| E
+    E --> F
+    F -->|Yes| G
+    G --> M
+    F -->|No| H
+    H --> I
+    I -->|No| M
+    I -->|Yes| J
+    J --> K
+    K --> L
+    L --> M
 
 
 
