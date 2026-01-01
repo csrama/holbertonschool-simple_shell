@@ -114,18 +114,18 @@ Only approved system calls and functions are used, such as:
 
 flowchart TD
     A["Start hsh"]
-    B["Display prompt"]
+    B["Show prompt"]
     C["Read input"]
     D{"EOF?"}
     E["Parse input"]
     F{"Built in?"}
-    G["Execute built in"]
-    H["Resolve command path"]
+    G["Run built in"]
+    H["Find command"]
     I{"Found?"}
-    J["Fork process"]
+    J["Fork"]
     K["execve"]
     L["waitpid"]
-    M["Exit shell"]
+    M["Exit"]
 
     A --> B
     B --> C
@@ -137,6 +137,7 @@ flowchart TD
     F -->|No| H --> I
     I -->|No| M
     I -->|Yes| J --> K --> L --> B
+
 
 ##  Contributors
 
