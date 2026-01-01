@@ -1,27 +1,33 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+/* INCLUDES */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
-#include <stddef.h>
+#include <string.h>
+#include <sys/types.h>
+#include <errno.h>
 
-/* Global environment */
+/*  MACROS  */
+#define BUFFER_SIZE 1024
+
+/* GLOBALS */
 extern char **environ;
-
-/* Global variables for error reporting */
 extern char *prog_name;
 extern unsigned int line_number;
 
-/* Prototypes */
+/*  FUNCTION PROTOTYPES */
+
+/* getline replacement */
+ssize_t _getline(char **lineptr, size_t *n);
+
+/* command execution */
 int execute_command(char **args);
-char *find_path(const char *command);
-char *get_path(void);
-int resolve_command(char *cmd, char *full, size_t size, char **envp);
-/* add this prototype */
-int check_builtin(char **args);
-#endif
+
+/* helpers (if you already have them / will add later) */
+char *_getenv(const char *name);
+char *_which(char *command);
+
+#endif /* SHELL_H */
