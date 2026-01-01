@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-/*  MACROS  */
+/* MACROS */
 #define BUFFER_SIZE 1024
 
 /* GLOBALS */
@@ -18,15 +18,9 @@ extern char **environ;
 extern char *prog_name;
 extern unsigned int line_number;
 
-/*  FUNCTION PROTOTYPES */
-
-/* getline replacement */
+/* FUNCTION PROTOTYPES */
 ssize_t _getline(char **lineptr, size_t *n);
-
-/* command execution */
 int execute_command(char **args);
-
-/* helpers (if you already have them / will add later) */
 char *_getenv(const char *name);
 char *_which(char *command);
 
