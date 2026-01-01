@@ -1,4 +1,6 @@
 #include "shell.h"
+#include <sys/stat.h>
+
 
 /**
  * get_path - extracts the PATH string from the environment
