@@ -112,6 +112,8 @@ Only approved system calls and functions are used, such as:
 | `Simple shell 0.4`   | Implement exit built-in                |
 | `Simple shell 1.0`   | Implement env built-in                 |
 
+## FlowChart
+
 ```mermaid
 flowchart TD
     A["Start hsh"]
