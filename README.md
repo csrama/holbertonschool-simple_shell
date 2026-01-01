@@ -113,19 +113,19 @@ Only approved system calls and functions are used, such as:
 | `Simple shell 1.0`   | Implement env built-in                 |
 
 flowchart TD
-    A[Start hsh]
-    B[Display prompt]
-    C[Read input]
-    D{EOF}
-    E[Parse input]
-    F{Built in}
-    G[Execute built in]
-    H[Resolve command]
-    I{Found}
-    J[Fork]
-    K[execve]
-    L[waitpid]
-    M[Exit shell]
+    A["Start hsh"]
+    B["Display prompt"]
+    C["Read input"]
+    D{"EOF?"}
+    E["Parse input"]
+    F{"Built in?"}
+    G["Execute built in"]
+    H["Resolve command path"]
+    I{"Found?"}
+    J["Fork process"]
+    K["execve"]
+    L["waitpid"]
+    M["Exit shell"]
 
     A --> B
     B --> C
@@ -133,19 +133,10 @@ flowchart TD
     D -->|Yes| M
     D -->|No| E
     E --> F
-    F -->|Yes| G
-    G --> M
-    F -->|No| H
-    H --> I
+    F -->|Yes| G --> M
+    F -->|No| H --> I
     I -->|No| M
-    I -->|Yes| J
-    J --> K
-    K --> L
-    L --> M
-
-
-
-
+    I -->|Yes| J --> K --> L --> B
 
 ##  Contributors
 
