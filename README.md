@@ -112,6 +112,47 @@ Only approved system calls and functions are used, such as:
 | `Simple shell 0.4`   | Implement exit built-in                |
 | `Simple shell 1.0`   | Implement env built-in                 |
 
+## flowchart
+
+    A[Start hsh] --> B{Interactive mode?}
+
+    B -->|Yes| C[Display prompt "$"]
+    B -->|No| D[Skip prompt]
+
+    C --> E[Read input (_getline)]
+    D --> E
+
+    E --> F{EOF (Ctrl+D)?}
+    F -->|Yes| G[Free memory]
+    G --> H[Exit shell]
+
+    F -->|No| I[Parse input into argv]
+
+    I --> J{Built-in command?}
+
+    J -->|Yes| K[Execute built-in<br/>(exit / env)]
+    K --> H
+
+    J -->|No| L[Resolve command path<br/>(PATH / absolute)]
+
+    L --> M{Command found?}
+
+    M -->|No| N[Print error]
+    N --> O[Set exit status = 127]
+    O --> P[Free memory]
+    P --> Q[Loop again]
+
+    M -->|Yes| R[Fork process]
+    R --> S[execve()]
+    S --> T[waitpid()]
+    T --> U[Get exit status]
+    U --> P
+
+
+
+
+
+
 ##  Contributors
 
 This project was developed and tested by:
